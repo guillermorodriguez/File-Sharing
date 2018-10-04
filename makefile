@@ -1,8 +1,8 @@
-# --------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # @Author:    Guillermo Rodriguez
 # @Created:   10/02/2018
 # @Purpose:   Automate the build file process for a Java application.
-# --------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # Java Compiler
 JC = javac
@@ -10,13 +10,18 @@ JC = javac
 # Turn Debugging On
 JFLAG = -g
 
-default: server.class client.class
+.SUFFIXES: .java .class
 
-server.class: server.java
-  $(JC) $(JFLAG) server.java
+.java.class:
+	$(JC) $(JFLAG) $*.java
 
-client.class: client.java
-  $(JC) $(JFLAG) client.java
-  
+CLASSES = \
+	  consumer.class \
+	  producer.class
+
+default: classes
+
+classes: $(CLASSES:.java=.class)
+
 clean:
-  $(RM) *.class
+	$(RM) *.class
