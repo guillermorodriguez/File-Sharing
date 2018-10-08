@@ -19,6 +19,7 @@ public class producer extends Thread {
 
   protected String sink;
   protected int port;
+  private static final String result_file_name = "./results/data.txt";
 
   public producer(String sink, int port){
     System.out.println("Client Ready to Communicate .... ");
@@ -64,8 +65,25 @@ public class producer extends Thread {
         writer.println(line);
         System.out.println("<< " + reader.readLine());
       }
-      long _end = System.nanoTime() - _start;
-      System.out.println("Processing Time " +  TimeUnit.NANOSECONDS.toSeconds(_end) + "s");
+
+      long _end = System.nanoTime();
+      // Write Processing Time Details
+      BufferedWriter write = null;
+      FileWriter fwrite = null;
+      try{
+        File _result = new File(result_file_name);
+        fwrite = new FileWriter(_result.getAbsoluteFile(), true);
+        write = new BufferedWriter(fwrite);
+        write.write("Started : " + _start + '\n');
+        write.write("Ended   : " + _end + '\n');
+
+        write.close();
+        fwrite.close();
+      }
+      catch(IOException ex){
+        System.out.println("Error Creating Results File.");
+        System.exit(1);
+      }
 
       file_reader.close();
 
@@ -111,6 +129,26 @@ public class producer extends Thread {
       System.exit(1);
     }
 
+    // Set Results Output Stream
+    BufferedWriter write = null;
+    FileWriter fwrite = null;
+    try{
+      File _result = new File(result_file_name);
+      if( !_result.exists() ){ _result.createNewFile(); }
+
+      fwrite = new FileWriter(_result.getAbsoluteFile());
+      write = new BufferedWriter(fwrite);
+      write.write("Test Results" + '\n');
+
+      write.close();
+      fwrite.close();
+    }
+    catch(IOException ex){
+      System.out.println("Error Creating Results File.");
+      System.exit(1);
+    }
+
+    // Create Threads
     for( int counter = 0; counter < Integer.parseInt(args[2]);  counter++){
       new producer(args[0], Integer.parseInt(args[1]));
     }
