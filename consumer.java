@@ -9,6 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import java.util.*;
+import java.util.concurrent.Semaphore;
 
 /**
  *	The purpose of this class is to function as a server instance that
@@ -21,14 +22,18 @@ public class consumer extends Thread {
   protected Socket sock = null;
   protected int max_threads = 0;
   protected HashMap map = null;
+  protected int thread_count = 0;
+  protected Semaphore gate_keeper = null;
 
   private consumer(Socket sock, int max_threads){
   	 System.out.println("Server Connection Established");
 
 	   this.sock = sock;
      this.max_threads = max_threads;
-
      this.map = new HashMap();
+     this.thread_count += 1;
+     this.gate_keeper = new Semaphore(max_threads, true);
+
 	   start();
   }
 
@@ -45,11 +50,27 @@ public class consumer extends Thread {
 
       String data = "";
       while( ( data = reader.readLine() ) != null ){
-        System.out.println("Input Stream: " + data);
 
-        this.map.put(this.sock.getRemoteSocketAddress(), data);
+        try{
+          gate_keeper.acquire();
 
-        output.write(("[Acknowledged]:"+data+'\n').getBytes());
+          String name = Thread.currentThread().getName() + this.thread_count;
+
+          System.out.println("Current Thread: " + name);
+          System.out.println("Input Stream: " + data);
+
+          this.map.put(name, data);
+
+          output.write((data+'\n').getBytes());
+
+          System.out.println(this.map);
+        }
+        catch(Exception ex){
+          System.out.println("Error Acquiring Thread Lock");
+        }
+        finally{
+          gate_keeper.release();
+        }
       }
 
   	}
@@ -102,6 +123,7 @@ public class consumer extends Thread {
   	try{
   		listener = new ServerSocket(Integer.parseInt(args[0]));
       while(true){
+        // Instantiate Connection Pools
         new consumer(listener.accept(), Integer.parseInt(args[1]));
       }
 
