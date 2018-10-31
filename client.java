@@ -15,13 +15,13 @@ import java.util.concurrent.TimeUnit;
  *	sends data by the defined port from the command line and then
  *	accepts a response from the server.
  */
-public class producer extends Thread {
+public class client extends Thread {
 
   protected String sink;
   protected int port;
   private static final String result_file_name = "./results/data.txt";
 
-  public producer(String sink, int port){
+  public client(String sink, int port){
     System.out.println("Client Ready to Communicate .... ");
 
     this.sink = sink;
@@ -150,7 +150,7 @@ public class producer extends Thread {
 
     // Create Threads
     for( int counter = 0; counter < Integer.parseInt(args[2]);  counter++){
-      new producer(args[0], Integer.parseInt(args[1]));
+      new client(args[0], Integer.parseInt(args[1]));
     }
 
 
