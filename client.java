@@ -25,7 +25,7 @@ public class client extends Thread {
   protected int thread_count = 0;
   protected Semaphore gate_keeper = null;
 
-  private consumer(Socket sock, int max_threads){
+  private client(Socket sock, int max_threads){
   	 System.out.println("Server Connection Established");
 
 	   this.sock = sock;
