@@ -16,8 +16,8 @@ JFLAG = -g
 	$(JC) $(JFLAG) $*.java
 
 CLASSES = \
-	  consumer.class \
-	  producer.class
+	  client.class \
+	  server.class
 
 default: classes
 
