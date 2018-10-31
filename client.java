@@ -16,7 +16,7 @@ import java.util.concurrent.Semaphore;
  *	accepts data connections by the defined port from the command
  *	line and then processes data captured by client.
  */
-public class client extends Thread {
+public class server extends Thread {
 
 
   protected Socket sock = null;
@@ -25,7 +25,7 @@ public class client extends Thread {
   protected int thread_count = 0;
   protected Semaphore gate_keeper = null;
 
-  private client(Socket sock, int max_threads){
+  private server(Socket sock, int max_threads){
   	 System.out.println("Server Connection Established");
 
 	   this.sock = sock;
@@ -124,7 +124,7 @@ public class client extends Thread {
   		listener = new ServerSocket(Integer.parseInt(args[0]));
       while(true){
         // Instantiate Connection Pools
-        new consumer(listener.accept(), Integer.parseInt(args[1]));
+        new server(listener.accept(), Integer.parseInt(args[1]));
       }
 
   	}
