@@ -16,7 +16,7 @@ import java.util.concurrent.Semaphore;
  *	accepts data connections by the defined port from the command
  *	line and then processes data captured by client.
  */
-public class consumer extends Thread {
+public class client extends Thread {
 
 
   protected Socket sock = null;
