@@ -24,15 +24,16 @@ public class server extends Thread {
   protected HashMap map = null;
   protected int thread_count = 0;
   protected Semaphore gate_keeper = null;
+  protected HashMap<Integer, String> users = null;
 
   private server(Socket sock, int max_threads){
-  	 System.out.println("Server Connection Established");
+  	 System.out.println("Peer Connection Established");
 
 	   this.sock = sock;
      this.max_threads = max_threads;
-     this.map = new HashMap();
      this.thread_count += 1;
      this.gate_keeper = new Semaphore(max_threads, true);
+     this.users = new HashMap<Integer, String>();
 
 	   start();
   }
@@ -59,11 +60,18 @@ public class server extends Thread {
           System.out.println("Current Thread: " + name);
           System.out.println("Input Stream: " + data);
 
-          this.map.put(name, data);
+          // Parse Input Stream
+          output.write(data.getBytes());
+          String[] data_stream = data.split(":");
+          System.out.println("Processing Command: " + data_stream[0]);
 
-          output.write((data+'\n').getBytes());
+          if( data_stream[0] == "Login" ){
+            String[] command_detail = data_stream[1].split(",");
+            this.users.put(Integer.parseInt(command_detail[0]), command_detail[1]);
+            System.out.println(this.users);
+          }
 
-          System.out.println(this.map);
+
         }
         catch(Exception ex){
           System.out.println("Error Acquiring Thread Lock");
@@ -96,35 +104,20 @@ public class server extends Thread {
    */
   public static void main(String[] args) {
 
-  	String expression = "\\d+";
+  	int port = 9000;
+    int threads = 1;
 
-  	if( args.length != 2 ) {
-      System.out.println("Fatal Exception. Invalid Input.");
-  		System.out.println("First argument must be integer for port");
-      System.out.println("Second argument must be integer for max thread count");
-
-      System.exit(1);
-    }
-    else if( !args[0].matches(expression) ){
-      System.out.println("Port Value Invalid");
-      System.exit(1);
-    }
-    else if( !args[1].matches(expression) ){
-      System.out.println("Thread Count Value Invalid");
-      System.exit(1);
-    }
-
-		System.out.println("Server Listening on Port: " + args[0] );
-    System.out.println("Thread Count Maximum: " + args[1]);
+		System.out.println("Server Listening on Port: " + Integer.toString(port) );
+    System.out.println("Thread Count Maximum: " + Integer.toString(threads));
 
 
     ServerSocket listener = null;
 
   	try{
-  		listener = new ServerSocket(Integer.parseInt(args[0]));
+  		listener = new ServerSocket(port);
       while(true){
         // Instantiate Connection Pools
-        new server(listener.accept(), Integer.parseInt(args[1]));
+        new server(listener.accept(), threads);
       }
 
   	}
