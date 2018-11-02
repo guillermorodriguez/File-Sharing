@@ -64,17 +64,17 @@ public class server extends Thread {
           String[] data_stream = data.split(":");
           System.out.println("Processing Command: " + data_stream[0]);
 
-          if( data_stream[0] == "Login" ){
+          if( data_stream[0].equals("Login") ){
             String[] command_detail = data_stream[1].split(",");
             this.users.put(Integer.parseInt(command_detail[0]), command_detail[1]);
             System.out.println(this.users);
           }
-          else if( data_stream[0] == "Get" ){
+          else if( data_stream[0].equals("Get") ){
             int good_peer = 0;
             System.out.println("Peer: " + this.users.get(good_peer) );
 
           }
-          else if( data_stream[0] == "Sync" ){
+          else if( data_stream[0].equals("Sync") ){
 
           }
 

@@ -17,47 +17,50 @@ import java.util.concurrent.TimeUnit;
  */
 public class peer extends Thread {
 
-  protected String sink = null;
-  protected int port;
-  protected int id;
-  protected String result_file_name;
+  protected String sink = "";
+  protected int port = 0;
+  protected int id = -1;
+  protected String result_file_name = "";
   protected BufferedWriter write = null;
-  protected FileWriter fwrite = null;
-  protected File _result = null;
-  protected String ip = null;
-  protected int server_port;
+  protected FileWriter file_write = null;
+  protected File result = null;
+  protected String ip = "";
+  protected int server_port = 0;
 
   public peer(String sink, int port, int id){
-    System.out.println("Peer Ready to Communicate .... ");
 
+    // Variable Instantiations
     this.sink = sink;
     this.port = port;
     this.id = id;
     this.result_file_name = "./" + String.valueOf(id) + "/log/log.log";
+    this.ip = "127.0.0.1";
+    this.server_port = 9000 + this.id;
 
     // Set Results Output Stream
     try{
-      this._result = new File(result_file_name);
-      if( !_result.exists() ){ _result.createNewFile(); }
+      this.result = new File(this.result_file_name);
+      if( !this.result.exists() ){ this.result.createNewFile(); }
 
-      this.fwrite = new FileWriter(_result.getAbsoluteFile());
-      this.write = new BufferedWriter(fwrite);
-      write.write("Test Results" + '\n');
+      this.file_write = new FileWriter(this.result.getAbsoluteFile());
+      this.write = new BufferedWriter(this.file_write);
+      this.write.write("Test Results" + '\n');
 
-      write.close();
-      fwrite.close();
+      this.write.close();
+      this.file_write.close();
     }
     catch(IOException ex){
       System.out.println("Error Creating Results File.");
       System.exit(1);
     }
 
-    this.ip = "127.0.0.1";
-    this.server_port = 9000 + this.id;
-
+    // Start Client Thread
     start();
+
+    System.out.println("Peer Online .... ");
   }
 
+  // Thread Invocation
   public void run(){
     Socket sock = null;
     PrintWriter writer = null;
@@ -98,13 +101,17 @@ public class peer extends Thread {
         System.out.println("Processing Command: " + input);
 
         String parameters = "";
-        if (input == "Sync"){
+        if (input.equals("Sync")){
           System.out.println(">>Synchronizing Files");
           // Read through directory structure
-
+          for( File _file : (new File("./" + String.valueOf(id) + "/")).listFiles() ){
+            if( _file.isFile() ){
+              System.out.println("Processing File: " + _file.getName() );
+            }
+          }
 
         }
-        else if( input == "Get"){
+        else if(input.equals("Get")){
           System.out.println(">>File Name: ");
           input = command_line.readLine();
           if( input == null){
@@ -166,7 +173,17 @@ public class peer extends Thread {
       sock.close();
     }
     catch(Exception ex){
-      System.out.println("Error Processing Client");
+      System.out.println("Error Processing Client Socket");
+    }
+
+    /*
+        Manage data stream to clients
+    */
+    try{
+
+    }
+    catch(Exception ex){
+      System.out.println("Error Processing Server Socket");
     }
   }
 
@@ -182,9 +199,9 @@ public class peer extends Thread {
         Handle Input Validation
     */
     String expression_numeric = "\\d+";
-  	if( args.length != 1 ) {
+  	if( args.length != 1 || !args[0].matches(expression_numeric) ) {
       System.out.println("Fatal Exception. Invalid Input.");
-  		System.out.println("First argument must be user id");
+  		System.out.println("First Argument Must Be An Id - An Integer Value.");
 
       System.exit(1);
     }
