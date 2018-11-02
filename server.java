@@ -3,7 +3,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.PrintWriter;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -41,12 +41,12 @@ public class server extends Thread {
   public void run(){
 
   	InputStream input = null;
-	  OutputStream output = null;
+	  PrintWriter output = null;
     BufferedReader reader = null;
 
   	try{
       input = this.sock.getInputStream();
-      output = this.sock.getOutputStream();
+      output = new PrintWriter(this.sock.getOutputStream(), true);
       reader = new BufferedReader(new InputStreamReader(input));
 
       String data = "";
@@ -61,7 +61,6 @@ public class server extends Thread {
           System.out.println("Input Stream: " + data);
 
           // Parse Input Stream
-          output.write(data.getBytes());
           String[] data_stream = data.split(":");
           System.out.println("Processing Command: " + data_stream[0]);
 
@@ -70,11 +69,23 @@ public class server extends Thread {
             this.users.put(Integer.parseInt(command_detail[0]), command_detail[1]);
             System.out.println(this.users);
           }
+          else if( data_stream[0] == "Get" ){
+            int good_peer = 0;
+            System.out.println("Peer: " + this.users.get(good_peer) );
 
+          }
+          else if( data_stream[0] == "Sync" ){
 
+          }
+
+          // Provide Server Confirmation of Data Input stream
+          output.println("GOOD");
         }
         catch(Exception ex){
           System.out.println("Error Acquiring Thread Lock");
+
+          // Send Error Notification to client
+          output.println("BAD");
         }
         finally{
           gate_keeper.release();

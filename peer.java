@@ -89,8 +89,9 @@ public class peer extends Thread {
       String line = "";
       String input = "";
 
-      writer.println("Login:" + String.valueOf(id) + "," + this.ip + "-" String.valueOf(this.server_port) );
+      writer.println("Login:" + String.valueOf(id) + "," + this.ip + "-" + String.valueOf(this.server_port) );
       System.out.println(">>Commands: Sync, Get");
+      System.out.print(">> ");
 
       BufferedReader command_line = new BufferedReader(new InputStreamReader(System.in));
       while( (input = command_line.readLine()) != null ){
@@ -99,8 +100,8 @@ public class peer extends Thread {
         String parameters = "";
         if (input == "Sync"){
           System.out.println(">>Synchronizing Files");
-
           // Read through directory structure
+
 
         }
         else if( input == "Get"){
@@ -110,9 +111,21 @@ public class peer extends Thread {
             break;
           }
 
+
+
         }
 
         writer.println(input);
+
+        String server_response = reader.readLine();
+        if( server_response == "GOOD"){
+          System.out.println("Respnse: GOOD");
+        }
+        else{
+          System.out.println("Response: " + server_response);
+        }
+
+        System.out.print(">> ");
       }
 
 
