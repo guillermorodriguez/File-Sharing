@@ -104,11 +104,17 @@ public class peer extends Thread {
         if (input.equals("Sync")){
           System.out.println(">>Synchronizing Files");
           // Read through directory structure
-          for( File _file : (new File("./" + String.valueOf(id) + "/")).listFiles() ){
-            if( _file.isFile() ){
+          for(File _file : (new File("./" + String.valueOf(id) + "/")).listFiles()){
+            if(_file.isFile()){
+              if(parameters.length() > 0){
+                parameters += ",";
+              }
+              parameters += _file.getName();
+
               System.out.println("Processing File: " + _file.getName() );
             }
           }
+          // Communicate File Store to Server
 
         }
         else if(input.equals("Get")){
