@@ -1,4 +1,4 @@
-
+import java.io.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +25,7 @@ public class server extends Thread {
   protected int thread_count = 0;
   protected Semaphore gate_keeper = null;
   protected HashMap<Integer, String> users = null;
+  private static String SESSION = "./database/users.txt";
 
   private server(Socket sock, int max_threads){
   	 System.out.println("Peer Connection Established");
@@ -64,18 +65,55 @@ public class server extends Thread {
           String[] data_stream = data.split(":");
           System.out.println("Processing Command: " + data_stream[0]);
 
-          if( data_stream[0].equals("Login") ){
+          if( data_stream.length == 2 && data_stream[0].equals("Login") ){
+            // Login
+
             String[] command_detail = data_stream[1].split(",");
             this.users.put(Integer.parseInt(command_detail[0]), command_detail[1]);
             System.out.println(this.users);
-          }
-          else if( data_stream[0].equals("Get") ){
-            int good_peer = 0;
-            System.out.println("Peer: " + this.users.get(good_peer) );
+
+            // Set To Data Store
+            File _sessions = new File(SESSION);
+            try {
+              // Determine if Session exists
+              Boolean session_exists = false;
+              String entry = "";
+
+              File session_store = new File(SESSION);
+              if (session_store.exists() && !session_store.isDirectory() ){
+                BufferedReader sessions = new BufferedReader(new FileReader(SESSION));
+                while( (entry = sessions.readLine()) != null ){
+                  if( entry.equals(command_detail[1]) ){
+                    System.out.println("Session Exists!");
+                    session_exists = true;
+                    break;
+                  }
+                }
+              }
+
+              if( !session_exists ){
+                // Write User Session to Database.
+                BufferedWriter session = new BufferedWriter(new FileWriter(SESSION, true));
+                session.write(command_detail[1]+"\n");
+                session.close();
+              }
+            }
+            catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
 
           }
-          else if( data_stream[0].equals("Sync") ){
+          else if( data_stream.length == 3 && data_stream[0].equals("Get") ){
+            // Get File
+            System.out.println("Peer: " + this.users.get( Integer.parseInt(data_stream[1]) ) );
 
+          }
+          else if( data_stream.length == 3 && data_stream[0].equals("Sync") ){
+            // Synchronize Content
+
+          }
+          else{
+            System.out.println("Invalid Command");
           }
 
           // Provide Server Confirmation of Data Input stream

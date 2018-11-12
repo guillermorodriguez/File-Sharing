@@ -114,18 +114,15 @@ public class peer extends Thread {
               System.out.println("Processing File: " + _file.getName() );
             }
           }
-          // Communicate File Store to Server
-
+          input += ":" + String.valueOf(this.id) + ":" + parameters;
         }
         else if(input.equals("Get")){
           System.out.println(">>File Name: ");
-          input = command_line.readLine();
+          parameters = command_line.readLine();
           if( input == null){
             break;
           }
-
-
-
+          input += ":" + String.valueOf(this.id) + ":" + parameters;
         }
 
         writer.println(input);
