@@ -26,6 +26,7 @@ public class server extends Thread {
   protected Semaphore gate_keeper = null;
   protected HashMap<Integer, String> users = null;
   private static String SESSION = "./database/users.txt";
+  private static String FILES = "./files/";
 
   private server(Socket sock, int max_threads){
   	 System.out.println("Peer Connection Established");
@@ -72,36 +73,28 @@ public class server extends Thread {
             this.users.put(Integer.parseInt(command_detail[0]), command_detail[1]);
             System.out.println(this.users);
 
-            // Set To Data Store
-            File _sessions = new File(SESSION);
-            try {
-              // Determine if Session exists
-              Boolean session_exists = false;
-              String entry = "";
+            // Determine if Session exists
+            Boolean session_exists = false;
+            String entry = "";
 
-              File session_store = new File(SESSION);
-              if (session_store.exists() && !session_store.isDirectory() ){
-                BufferedReader sessions = new BufferedReader(new FileReader(SESSION));
-                while( (entry = sessions.readLine()) != null ){
-                  if( entry.equals(command_detail[1]) ){
-                    System.out.println("Session Exists!");
-                    session_exists = true;
-                    break;
-                  }
+            File session_store = new File(SESSION);
+            if (session_store.exists() && !session_store.isDirectory() ){
+              BufferedReader sessions = new BufferedReader(new FileReader(SESSION));
+              while( (entry = sessions.readLine()) != null ){
+                if( entry.equals(command_detail[1]) ){
+                  System.out.println("Session Exists!");
+                  session_exists = true;
+                  break;
                 }
               }
-
-              if( !session_exists ){
-                // Write User Session to Database.
-                BufferedWriter session = new BufferedWriter(new FileWriter(SESSION, true));
-                session.write(command_detail[1]+"\n");
-                session.close();
-              }
-            }
-            catch (Exception ex) {
-                System.out.println(ex.getMessage());
             }
 
+            if( !session_exists ){
+              // Write User Session to Database.
+              BufferedWriter session = new BufferedWriter(new FileWriter(SESSION, true));
+              session.write(command_detail[1]+"\n");
+              session.close();
+            }
           }
           else if( data_stream.length == 3 && data_stream[0].equals("Get") ){
             // Get File
