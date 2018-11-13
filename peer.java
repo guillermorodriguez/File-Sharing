@@ -88,11 +88,19 @@ public class peer extends Thread {
     */
     try{
 
+      String server_response = "";
       long _start = System.nanoTime();
       String line = "";
       String input = "";
 
-      writer.println("Login:" + String.valueOf(id) + "," + this.ip + "-" + String.valueOf(this.server_port) );
+      String login_command = "Login:" + String.valueOf(id) + "," + this.ip + "-" + String.valueOf(this.server_port);
+      writer.println( login_command );
+
+      // Log Detail
+      BufferedWriter log_detail = new BufferedWriter(new FileWriter(this.result_file_name, true));
+      log_detail.write(login_command+"\n");
+      log_detail.close();
+
       System.out.println(">>Commands: Sync, Get");
       System.out.print(">> ");
 
@@ -115,6 +123,13 @@ public class peer extends Thread {
             }
           }
           input += ":" + String.valueOf(this.id) + ":" + parameters;
+
+          // Log Detail
+          log_detail = new BufferedWriter(new FileWriter(this.result_file_name, true));
+          log_detail.write(input+"\n");
+          log_detail.close();
+
+          writer.println(input);
         }
         else if(input.equals("Get")){
           System.out.println(">>File Name: ");
@@ -123,55 +138,38 @@ public class peer extends Thread {
             break;
           }
           input += ":" + String.valueOf(this.id) + ":" + parameters;
+
+          // Log Detail
+          log_detail = new BufferedWriter(new FileWriter(this.result_file_name, true));
+          log_detail.write(input+"\n");
+          log_detail.close();
+
+          writer.println(input);
+
+          System.out.println(reader.readLine());
         }
 
-        writer.println(input);
-
-        String server_response = reader.readLine();
-        if( server_response == "GOOD"){
-          System.out.println("Respnse: GOOD");
+        server_response = reader.readLine();
+        if( server_response.equals("GOOD")){
+          System.out.println("Response: GOOD");
         }
         else{
+
+          if( server_response.contains("CLIENT") ){
+            //
+            System.out.println("CLIENT!!!");
+          }
+
           System.out.println("Response: " + server_response);
         }
 
+        // Log Detail
+        log_detail = new BufferedWriter(new FileWriter(this.result_file_name, true));
+        log_detail.write(server_response+"\n");
+        log_detail.close();
+
         System.out.print(">> ");
       }
-
-
-
-      /*
-      BufferedReader file_reader = new BufferedReader(new FileReader("./data/input"));
-      while( (line = file_reader.readLine()) != null ){
-        System.out.println(">> " +line);
-        writer.println(line);
-        System.out.println("<< " + reader.readLine());
-      }
-
-      long _end = System.nanoTime();
-      // Write Processing Time Details
-      BufferedWriter write = null;
-      FileWriter fwrite = null;
-      try{
-        File _result = new File(result_file_name);
-        fwrite = new FileWriter(_result.getAbsoluteFile(), true);
-        write = new BufferedWriter(fwrite);
-        write.write("Started : " + _start + '\n');
-        write.write("Ended   : " + _end + '\n');
-
-        write.close();
-        fwrite.close();
-      }
-      catch(IOException ex){
-        System.out.println("Error Creating Results File.");
-        System.exit(1);
-      }
-
-      file_reader.close();
-
-      writer.close();
-      reader.close();
-      */
 
       sock.close();
     }

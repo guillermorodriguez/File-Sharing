@@ -1,0 +1,4 @@
+Command: Login
+Command: Synch
+Command: Get Option: 2.file1.txt
+Command GetFile 2.file1.txt
