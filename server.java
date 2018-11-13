@@ -81,7 +81,7 @@ public class server extends Thread {
             if (session_store.exists() && !session_store.isDirectory() ){
               BufferedReader sessions = new BufferedReader(new FileReader(SESSION));
               while( (entry = sessions.readLine()) != null ){
-                if( entry.equals(command_detail[1]) ){
+                if( entry.equals(command_detail[0] + "," + command_detail[1]) ){
                   System.out.println("Session Exists!");
                   session_exists = true;
                   break;
@@ -92,7 +92,7 @@ public class server extends Thread {
             if( !session_exists ){
               // Write User Session to Database.
               BufferedWriter session = new BufferedWriter(new FileWriter(SESSION, true));
-              session.write(command_detail[1]+"\n");
+              session.write(command_detail[0] + "," + command_detail[1]+"\n");
               session.close();
             }
           }
@@ -103,7 +103,7 @@ public class server extends Thread {
           }
           else if( data_stream.length == 3 && data_stream[0].equals("Sync") ){
             // Synchronize Content
-
+            File file_store = new File(FILES );
           }
           else{
             System.out.println("Invalid Command");
